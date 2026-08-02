@@ -766,7 +766,7 @@
           <div><div class="t1">GitHub</div><div class="t2">github.com/K0NSU</div></div>
         </div>
       </div>
-      <form class="contact-form reveal" id="contactForm" action="https://formspree.io/dizonconstante3@gmail.com" method="POST">
+      <form class="contact-form reveal" id="contactForm" action="/api/contact" method="POST">
         <div class="form-group"><label>Name</label><input type="text" name="name" placeholder="Your name" required></div>
         <div class="form-group"><label>Email</label><input type="email" name="email" placeholder="you@example.com" required></div>
         <div class="form-group"><label>Subject</label><input type="text" name="subject" placeholder="What's this about?"></div>
@@ -839,7 +839,7 @@ function typeLoop(){
 }
 typeLoop();
 
-/* Contact form — submits to Formspree so messages actually send as email */
+/* Contact form — submits to our own Vercel serverless function, which sends the email via Gmail */
 const contactForm = document.getElementById('contactForm');
 const contactStatus = document.getElementById('contactStatus');
 const contactSubmitBtn = document.getElementById('contactSubmitBtn');
@@ -848,11 +848,12 @@ contactForm.addEventListener('submit', async function(e){
   contactSubmitBtn.disabled = true;
   contactSubmitBtn.textContent = 'Sending...';
   contactStatus.style.display = 'none';
+  const payload = Object.fromEntries(new FormData(contactForm).entries());
   try{
     const res = await fetch(contactForm.action, {
       method: 'POST',
-      body: new FormData(contactForm),
-      headers: { 'Accept': 'application/json' }
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
     });
     if(res.ok){
       contactStatus.textContent = "Message sent — I'll get back to you soon!";
